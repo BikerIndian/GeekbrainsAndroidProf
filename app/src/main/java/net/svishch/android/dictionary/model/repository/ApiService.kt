@@ -1,6 +1,6 @@
-package net.svishch.android.dictionary.model.datasource
+package net.svishch.android.dictionary.model.repository
 
-import net.svishch.android.dictionary.model.data.DataModel
+import net.svishch.android.dictionary.model.repository.entity.DataModel
 import io.reactivex.Observable
 import retrofit2.http.GET
 import retrofit2.http.Query

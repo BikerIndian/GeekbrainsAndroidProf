@@ -1,7 +1,7 @@
 package net.svishch.android.dictionary.presenter
 
-import net.svishch.android.dictionary.model.data.AppState
-import net.svishch.android.dictionary.view.base.View
+import net.svishch.android.dictionary.model.AppState
+import net.svishch.android.dictionary.view.View
 
 interface Presenter<T : AppState, V : View> {
 

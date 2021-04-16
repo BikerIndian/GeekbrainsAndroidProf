@@ -1,22 +1,22 @@
-package net.svishch.android.dictionary.view.main
+package net.svishch.android.dictionary.presenter.main
 
-import net.svishch.android.dictionary.model.data.AppState
+import net.svishch.android.dictionary.model.AppState
 import net.svishch.android.dictionary.model.datasource.DataSourceLocal
 import net.svishch.android.dictionary.model.datasource.DataSourceRemote
 import net.svishch.android.dictionary.model.repository.RepositoryImplementation
-import net.svishch.android.dictionary.presenter.Presenter
-import net.svishch.android.dictionary.rx.SchedulerProvider
-import net.svishch.android.dictionary.view.base.View
+import net.svishch.android.dictionary.presenter.rx.SchedulerProvider
+import net.svishch.android.dictionary.view.View
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableObserver
+import net.svishch.android.dictionary.presenter.Presenter
 
 class MainPresenterImpl<T : AppState, V : View>(
     private val interactor: MainInteractor = MainInteractor(
         RepositoryImplementation(DataSourceRemote()),
         RepositoryImplementation(DataSourceLocal())
     ),
-    protected val compositeDisposable: CompositeDisposable = CompositeDisposable(),
-    protected val schedulerProvider: SchedulerProvider = SchedulerProvider()
+    private val compositeDisposable: CompositeDisposable = CompositeDisposable(),
+    private val schedulerProvider: SchedulerProvider = SchedulerProvider()
 ) : Presenter<T, V> {
 
     private var currentView: V? = null

@@ -1,11 +1,12 @@
-package net.svishch.android.dictionary.model.datasource
+package net.svishch.android.dictionary.model.repository
 
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import net.svishch.android.dictionary.model.data.DataModel
+import net.svishch.android.dictionary.model.repository.entity.DataModel
 import io.reactivex.Observable
+import net.svishch.android.dictionary.model.datasource.BaseInterceptor
+import net.svishch.android.dictionary.model.datasource.DataSource
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -31,7 +32,9 @@ class RetrofitImplementation : DataSource<List<DataModel>> {
     private fun createOkHttpClient(interceptor: Interceptor): OkHttpClient {
         val httpClient = OkHttpClient.Builder()
         httpClient.addInterceptor(interceptor)
-        httpClient.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+
+        // Вывод лога полученных данных в консоль
+        // httpClient.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
         return httpClient.build()
     }
 

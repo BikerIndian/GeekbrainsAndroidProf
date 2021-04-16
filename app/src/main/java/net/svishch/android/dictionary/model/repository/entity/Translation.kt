@@ -1,4 +1,4 @@
-package net.svishch.android.dictionary.model.data
+package net.svishch.android.dictionary.model.repository.entity
 
 import com.google.gson.annotations.SerializedName
 
