@@ -1,9 +1,8 @@
-package net.svishch.android.dictionary.rx
+package net.svishch.android.dictionary.presenter.rx
 
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import net.svishch.android.dictionary.rx.ISchedulerProvider
 
 //In the sake of testing
 class SchedulerProvider : ISchedulerProvider {

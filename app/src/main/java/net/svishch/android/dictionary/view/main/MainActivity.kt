@@ -3,16 +3,17 @@ package net.svishch.android.dictionary.view.main
 import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
-import net.svishch.android.dictionary.model.data.AppState
-import net.svishch.android.dictionary.model.data.DataModel
+import net.svishch.android.dictionary.model.AppState
+import net.svishch.android.dictionary.model.repository.entity.DataModel
 import net.svishch.android.dictionary.presenter.Presenter
-import net.svishch.android.dictionary.view.base.BaseActivity
-import net.svishch.android.dictionary.view.base.View
-import net.svishch.android.dictionary.view.main.adapter.MainAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 import net.svishch.android.dictionary.R
+import net.svishch.android.dictionary.presenter.main.MainPresenterImpl
+import net.svishch.android.dictionary.view.BaseActivity
+import net.svishch.android.dictionary.view.View
 
 class MainActivity : BaseActivity<AppState>() {
 
@@ -31,14 +32,19 @@ class MainActivity : BaseActivity<AppState>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        search_fab.setOnClickListener {
-            val searchDialogFragment = SearchDialogFragment.newInstance()
-            searchDialogFragment.setOnSearchClickListener(object : SearchDialogFragment.OnSearchClickListener {
-                override fun onClick(searchWord: String) {
-                    presenter.getData(searchWord, true)
-                }
-            })
-            searchDialogFragment.show(supportFragmentManager, BOTTOM_SHEET_FRAGMENT_DIALOG_TAG)
+
+        input_layout.setEndIconOnClickListener {
+            presenter.getData(input_edit_text.text.toString(), true)
+        }
+
+        // Отработка нажатия ENTER
+        input_edit_text.setOnEditorActionListener { v, actionId, event ->
+            println(actionId)
+            if (actionId == EditorInfo.IME_ACTION_UNSPECIFIED || actionId == EditorInfo.IME_ACTION_SEARCH) {
+                presenter.getData(input_edit_text.text.toString(), true)
+                return@setOnEditorActionListener true
+            }
+            return@setOnEditorActionListener false
         }
     }
 
@@ -51,8 +57,10 @@ class MainActivity : BaseActivity<AppState>() {
                 } else {
                     showViewSuccess()
                     if (adapter == null) {
-                        main_activity_recyclerview.layoutManager = LinearLayoutManager(applicationContext)
-                        main_activity_recyclerview.adapter = MainAdapter(onListItemClickListener, dataModel)
+                        main_activity_recyclerview.layoutManager =
+                            LinearLayoutManager(applicationContext)
+                        main_activity_recyclerview.adapter =
+                            MainAdapter(onListItemClickListener, dataModel)
                     } else {
                         adapter!!.setData(dataModel)
                     }
@@ -84,24 +92,22 @@ class MainActivity : BaseActivity<AppState>() {
     }
 
     private fun showViewSuccess() {
-        success_linear_layout.visibility = VISIBLE
         loading_frame_layout.visibility = GONE
         error_linear_layout.visibility = GONE
     }
 
     private fun showViewLoading() {
-        success_linear_layout.visibility = GONE
         loading_frame_layout.visibility = VISIBLE
         error_linear_layout.visibility = GONE
     }
 
     private fun showViewError() {
-        success_linear_layout.visibility = GONE
         loading_frame_layout.visibility = GONE
         error_linear_layout.visibility = VISIBLE
     }
 
     companion object {
-        private const val BOTTOM_SHEET_FRAGMENT_DIALOG_TAG = "74a54328-5d62-46bf-ab6b-cbf5fgt0-092395"
+        private const val BOTTOM_SHEET_FRAGMENT_DIALOG_TAG =
+            "74a54328-5d62-46bf-ab6b-cbf5fgt0-092395"
     }
 }

@@ -1,4 +1,6 @@
-package net.svishch.android.dictionary.model.data
+package net.svishch.android.dictionary.model
+
+import net.svishch.android.dictionary.model.repository.entity.DataModel
 
 sealed class AppState {
 

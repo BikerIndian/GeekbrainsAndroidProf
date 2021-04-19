@@ -1,6 +1,6 @@
 package net.svishch.android.dictionary.model.datasource
 
-import net.svishch.android.dictionary.model.data.DataModel
+import net.svishch.android.dictionary.model.repository.entity.DataModel
 import io.reactivex.Observable
 
 class DataSourceLocal(private val remoteProvider: RoomDataBaseImplementation = RoomDataBaseImplementation()) :

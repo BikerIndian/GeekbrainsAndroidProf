@@ -1,22 +1,18 @@
-package net.svishch.android.dictionary.view.base
+package net.svishch.android.dictionary.view
 
-import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import net.svishch.android.dictionary.model.data.AppState
+import net.svishch.android.dictionary.model.AppState
 import net.svishch.android.dictionary.presenter.Presenter
 
 abstract class BaseActivity<T : AppState> : AppCompatActivity(), View {
 
-    protected lateinit var presenter: Presenter<T, View>
+    protected val presenter: Presenter<T, View> by lazy {
+        createPresenter()
+    }
 
     protected abstract fun createPresenter(): Presenter<T, View>
 
     abstract override fun renderData(appState: AppState)
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        presenter = createPresenter()
-    }
 
     override fun onStart() {
         super.onStart()

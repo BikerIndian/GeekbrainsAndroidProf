@@ -1,11 +1,12 @@
-package net.svishch.android.dictionary.view.main.adapter
+package net.svishch.android.dictionary.view.main
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import coil.api.load
 
-import net.svishch.android.dictionary.model.data.DataModel
+import net.svishch.android.dictionary.model.repository.entity.DataModel
 import kotlinx.android.synthetic.main.activity_main_recyclerview_item.view.*
 import net.svishch.android.dictionary.R
 
@@ -32,7 +33,7 @@ class MainAdapter(private var onListItemClickListener: OnListItemClickListener, 
         return data.size
     }
 
-    inner class RecyclerItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class RecyclerItemViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
 
         fun bind(data: DataModel) {
             if (layoutPosition != RecyclerView.NO_POSITION) {
@@ -40,6 +41,14 @@ class MainAdapter(private var onListItemClickListener: OnListItemClickListener, 
                 itemView.description_textview_recycler_item.text = data.meanings?.get(0)?.translation?.translation
 
                 itemView.setOnClickListener { openInNewWindow(data) }
+                setImg("https:"+ (data.meanings?.get(0)?.imageUrl))
+            }
+        }
+
+        fun setImg(url: String) = with(view) {
+            iv_img.load(url) {
+                error(R.drawable.ic_load_error_vector)
+                placeholder(R.drawable.ic_no_photo_vector)
             }
         }
     }
