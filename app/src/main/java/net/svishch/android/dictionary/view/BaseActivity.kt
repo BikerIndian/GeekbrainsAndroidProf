@@ -1,26 +1,52 @@
 package net.svishch.android.dictionary.view
 
+import android.os.Bundle
+import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
+import net.svishch.android.dictionary.R
 import net.svishch.android.dictionary.model.AppState
-import net.svishch.android.dictionary.presenter.Presenter
+import net.svishch.android.dictionary.viewmodel.Interactor
+import net.svishch.android.dictionary.utils.isOnline
+import net.svishch.android.dictionary.utils.ui.AlertDialogFragment
+import net.svishch.android.dictionary.viewmodel.BaseViewModel
 
-abstract class BaseActivity<T : AppState> : AppCompatActivity(), View {
+abstract class BaseActivity<T : AppState, I : Interactor<T>> : AppCompatActivity() {
 
-    protected val presenter: Presenter<T, View> by lazy {
-        createPresenter()
+    abstract val model: BaseViewModel<T>
+
+    protected var isNetworkAvailable: Boolean = false
+
+    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+        super.onCreate(savedInstanceState, persistentState)
+        isNetworkAvailable = isOnline(applicationContext)
     }
 
-    protected abstract fun createPresenter(): Presenter<T, View>
-
-    abstract override fun renderData(appState: AppState)
-
-    override fun onStart() {
-        super.onStart()
-        presenter.attachView(this)
+    override fun onResume() {
+        super.onResume()
+        isNetworkAvailable = isOnline(applicationContext)
+        if (!isNetworkAvailable && isDialogNull()) {
+            showNoInternetConnectionDialog()
+        }
     }
 
-    override fun onStop() {
-        super.onStop()
-        presenter.detachView(this)
+    protected fun showNoInternetConnectionDialog() {
+        showAlertDialog(
+            getString(R.string.dialog_title_device_is_offline),
+            getString(R.string.dialog_message_device_is_offline)
+        )
+    }
+
+    protected fun showAlertDialog(title: String?, message: String?) {
+        AlertDialogFragment.newInstance(title, message).show(supportFragmentManager, DIALOG_FRAGMENT_TAG)
+    }
+
+    private fun isDialogNull(): Boolean {
+        return supportFragmentManager.findFragmentByTag(DIALOG_FRAGMENT_TAG) == null
+    }
+
+    abstract fun renderData(dataModel: T)
+
+    companion object {
+        private const val DIALOG_FRAGMENT_TAG = "74a54328-5d62-46bf-ab6b-cbf5d8c79522"
     }
 }

@@ -1,4 +1,4 @@
-package net.svishch.android.dictionary.presenter
+package net.svishch.android.dictionary.viewmodel
 
 import io.reactivex.Observable
 

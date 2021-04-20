@@ -1,4 +1,4 @@
-package net.svishch.android.dictionary.presenter.rx
+package net.svishch.android.dictionary.model.rx
 
 import io.reactivex.Scheduler
 

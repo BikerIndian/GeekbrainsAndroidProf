@@ -5,17 +5,23 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import net.svishch.android.dictionary.model.AppState
 import net.svishch.android.dictionary.model.repository.entity.DataModel
-import net.svishch.android.dictionary.presenter.Presenter
 import kotlinx.android.synthetic.main.activity_main.*
 import net.svishch.android.dictionary.R
-import net.svishch.android.dictionary.presenter.main.MainPresenterImpl
+import net.svishch.android.dictionary.application.TranslatorApp
 import net.svishch.android.dictionary.view.BaseActivity
-import net.svishch.android.dictionary.view.View
+import javax.inject.Inject
 
-class MainActivity : BaseActivity<AppState>() {
+class MainActivity : BaseActivity<AppState, MainInteractor>() {
+
+    @Inject
+    internal lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    override lateinit var model: MainViewModel
 
     private var adapter: MainAdapter? = null
     private val onListItemClickListener: MainAdapter.OnListItemClickListener =
@@ -25,23 +31,25 @@ class MainActivity : BaseActivity<AppState>() {
             }
         }
 
-    override fun createPresenter(): Presenter<AppState, View> {
-        return MainPresenterImpl()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        TranslatorApp.component.inject(this)
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        model = viewModelFactory.create(MainViewModel::class.java)
+        model.subscribe().observe(this@MainActivity, Observer<AppState> { renderData(it) })
+
         input_layout.setEndIconOnClickListener {
-            presenter.getData(input_edit_text.text.toString(), true)
+            model.getData(input_edit_text.text.toString(), isNetworkAvailable)
         }
 
         // Отработка нажатия ENTER
         input_edit_text.setOnEditorActionListener { v, actionId, event ->
             println(actionId)
             if (actionId == EditorInfo.IME_ACTION_UNSPECIFIED || actionId == EditorInfo.IME_ACTION_SEARCH) {
-                presenter.getData(input_edit_text.text.toString(), true)
+                model.getData(input_edit_text.text.toString(), isNetworkAvailable)
                 return@setOnEditorActionListener true
             }
             return@setOnEditorActionListener false
@@ -87,7 +95,7 @@ class MainActivity : BaseActivity<AppState>() {
         showViewError()
         error_textview.text = error ?: getString(R.string.undefined_error)
         reload_button.setOnClickListener {
-            presenter.getData("hi", true)
+            model.getData("hi", isNetworkAvailable)
         }
     }
 
