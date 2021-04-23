@@ -25,7 +25,7 @@
         internet connection.
     </string>
     <string name="dialog_tittle_sorry">Sorry</string>
-
+    <string name="activity_exception">Sorry</string>
     <string name="error_stub">Error</string>
 
 
