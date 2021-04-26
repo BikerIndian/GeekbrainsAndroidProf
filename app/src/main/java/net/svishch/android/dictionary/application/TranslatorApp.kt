@@ -2,20 +2,19 @@ package net.svishch.android.dictionary.application
 
 
 import android.app.Application
-import net.svishch.android.dictionary.di.AppComponent
-import net.svishch.android.dictionary.di.DaggerAppComponent
+import net.svishch.android.dictionary.di.application
+import net.svishch.android.dictionary.di.mainScreen
+import org.koin.core.context.startKoin
 
 
 class TranslatorApp : Application(){
 
     override fun onCreate() {
         super.onCreate()
-        val component = DaggerAppComponent.builder().appContent(this).build()
-        TranslatorApp.component = component
+        startKoin {
+            modules(listOf(application, mainScreen))
+        }
     }
 
-    companion object {
-        lateinit var  component: AppComponent
-    }
 }
 

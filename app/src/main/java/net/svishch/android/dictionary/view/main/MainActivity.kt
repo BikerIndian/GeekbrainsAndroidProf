@@ -6,24 +6,20 @@ import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import net.svishch.android.dictionary.model.AppState
-import net.svishch.android.dictionary.model.repository.entity.DataModel
 import kotlinx.android.synthetic.main.activity_main.*
 import net.svishch.android.dictionary.R
-import net.svishch.android.dictionary.application.TranslatorApp
+import net.svishch.android.dictionary.model.AppState
+import net.svishch.android.dictionary.model.repository.entity.DataModel
+import net.svishch.android.dictionary.utils.isOnline
 import net.svishch.android.dictionary.view.BaseActivity
-import javax.inject.Inject
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class MainActivity : BaseActivity<AppState, MainInteractor>() {
 
-    @Inject
-    internal lateinit var viewModelFactory: ViewModelProvider.Factory
-
     override lateinit var model: MainViewModel
 
-    private var adapter: MainAdapter? = null
+    private val adapter: MainAdapter by lazy { MainAdapter(onListItemClickListener) }
     private val onListItemClickListener: MainAdapter.OnListItemClickListener =
         object : MainAdapter.OnListItemClickListener {
             override fun onItemClick(data: DataModel) {
@@ -33,14 +29,15 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        TranslatorApp.component.inject(this)
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        iniViewModel()
+        initViews()
+        initClickListener()
+    }
 
-        model = viewModelFactory.create(MainViewModel::class.java)
-        model.subscribe().observe(this@MainActivity, Observer<AppState> { renderData(it) })
-
+    private fun initClickListener() {
         input_layout.setEndIconOnClickListener {
             model.getData(input_edit_text.text.toString(), isNetworkAvailable)
         }
@@ -49,7 +46,12 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         input_edit_text.setOnEditorActionListener { v, actionId, event ->
             println(actionId)
             if (actionId == EditorInfo.IME_ACTION_UNSPECIFIED || actionId == EditorInfo.IME_ACTION_SEARCH) {
-                model.getData(input_edit_text.text.toString(), isNetworkAvailable)
+                isNetworkAvailable = isOnline(applicationContext)
+                if (isNetworkAvailable) {
+                    model.getData(input_edit_text.text.toString(), isNetworkAvailable)
+                } else {
+                    showNoInternetConnectionDialog()
+                }
                 return@setOnEditorActionListener true
             }
             return@setOnEditorActionListener false
@@ -59,19 +61,12 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     override fun renderData(appState: AppState) {
         when (appState) {
             is AppState.Success -> {
-                val dataModel = appState.data
-                if (dataModel == null || dataModel.isEmpty()) {
+                showViewWorking()
+                val data = appState.data
+                if (data.isNullOrEmpty()) {
                     showErrorScreen(getString(R.string.empty_server_response_on_success))
                 } else {
-                    showViewSuccess()
-                    if (adapter == null) {
-                        main_activity_recyclerview.layoutManager =
-                            LinearLayoutManager(applicationContext)
-                        main_activity_recyclerview.adapter =
-                            MainAdapter(onListItemClickListener, dataModel)
-                    } else {
-                        adapter!!.setData(dataModel)
-                    }
+                    adapter.setData(data)
                 }
             }
             is AppState.Loading -> {
@@ -86,9 +81,24 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
                 }
             }
             is AppState.Error -> {
-                showErrorScreen(appState.error.message)
+                showViewWorking()
+                showAlertDialog(getString(R.string.error_stub), appState.error.message)
             }
         }
+    }
+
+    private fun iniViewModel() {
+        if (main_activity_recyclerview.adapter != null) {
+            throw IllegalStateException(getString(R.string.activity_exception))
+        }
+        val viewModel: MainViewModel by viewModel()
+        model = viewModel
+        model.subscribe().observe(this@MainActivity, Observer<AppState> { renderData(it) })
+    }
+
+    private fun initViews() {
+        main_activity_recyclerview.layoutManager = LinearLayoutManager(applicationContext)
+        main_activity_recyclerview.adapter = adapter
     }
 
     private fun showErrorScreen(error: String?) {
@@ -112,6 +122,10 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     private fun showViewError() {
         loading_frame_layout.visibility = GONE
         error_linear_layout.visibility = VISIBLE
+    }
+
+    private fun showViewWorking() {
+        loading_frame_layout.visibility = GONE
     }
 
     companion object {

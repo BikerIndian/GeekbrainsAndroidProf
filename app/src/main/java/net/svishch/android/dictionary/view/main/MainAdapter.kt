@@ -10,8 +10,9 @@ import net.svishch.android.dictionary.model.repository.entity.DataModel
 import kotlinx.android.synthetic.main.activity_main_recyclerview_item.view.*
 import net.svishch.android.dictionary.R
 
-class MainAdapter(private var onListItemClickListener: OnListItemClickListener, private var data: List<DataModel>) :
+class MainAdapter(private var onListItemClickListener: OnListItemClickListener) :
     RecyclerView.Adapter<MainAdapter.RecyclerItemViewHolder>() {
+    private var data: List<DataModel> = arrayListOf()
 
     fun setData(data: List<DataModel>) {
         this.data = data
