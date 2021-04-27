@@ -64,6 +64,7 @@ fun mapHistoryEntityToSearchResult(list: List<HistoryEntity>): List<DataModel> {
     val searchResult = ArrayList<DataModel>()
     if (!list.isNullOrEmpty()) {
         for (entity in list) {
+
             searchResult.add(DataModel(entity.word, null))
         }
     }
