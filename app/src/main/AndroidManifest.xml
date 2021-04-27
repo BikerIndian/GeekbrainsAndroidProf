@@ -15,14 +15,20 @@
         android:name=".application.TranslatorApp">
         <activity
             android:name=".view.main.MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Dictionary.NoActionBar">
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".view.descriptionscreen.DescriptionActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.history.HistoryActivity"
+            android:screenOrientation="portrait"/>
+
     </application>
 
 </manifest>

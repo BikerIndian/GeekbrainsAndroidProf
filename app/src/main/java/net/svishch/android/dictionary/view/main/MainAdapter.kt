@@ -4,11 +4,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import coil.api.load
-
-import net.svishch.android.dictionary.model.repository.entity.DataModel
 import kotlinx.android.synthetic.main.activity_main_recyclerview_item.view.*
 import net.svishch.android.dictionary.R
+import net.svishch.android.dictionary.model.repository.entity.DataModel
+import net.svishch.android.dictionary.utils.ui.ImgLoader.Companion.usePicassoGetImg
 
 class MainAdapter(private var onListItemClickListener: OnListItemClickListener) :
     RecyclerView.Adapter<MainAdapter.RecyclerItemViewHolder>() {
@@ -39,17 +38,15 @@ class MainAdapter(private var onListItemClickListener: OnListItemClickListener) 
         fun bind(data: DataModel) {
             if (layoutPosition != RecyclerView.NO_POSITION) {
                 itemView.header_textview_recycler_item.text = data.text
-                itemView.description_textview_recycler_item.text = data.meanings?.get(0)?.translation?.translation
+                itemView.description_textview_recycler_item.text =
+                    data.meanings?.get(0)?.translation?.translation
 
                 itemView.setOnClickListener { openInNewWindow(data) }
-                setImg("https:"+ (data.meanings?.get(0)?.imageUrl))
-            }
-        }
+                val url = "https:" + (data.meanings?.get(0)?.imageUrl)
 
-        fun setImg(url: String) = with(view) {
-            iv_img.load(url) {
-                error(R.drawable.ic_load_error_vector)
-                placeholder(R.drawable.ic_no_photo_vector)
+                // useKoilGetImg(view.iv_img, url)
+                // useGlideGetImg(view.iv_img, url)
+                   usePicassoGetImg(view.iv_img, url)
             }
         }
     }

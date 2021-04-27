@@ -5,6 +5,7 @@ import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
 import net.svishch.android.dictionary.R
 import net.svishch.android.dictionary.model.AppState
+import net.svishch.android.dictionary.model.repository.entity.DataModel
 import net.svishch.android.dictionary.viewmodel.Interactor
 import net.svishch.android.dictionary.utils.isOnline
 import net.svishch.android.dictionary.utils.ui.AlertDialogFragment
@@ -49,4 +50,6 @@ abstract class BaseActivity<T : AppState, I : Interactor<T>> : AppCompatActivity
     companion object {
         private const val DIALOG_FRAGMENT_TAG = "74a54328-5d62-46bf-ab6b-cbf5d8c79522"
     }
+
+    abstract fun setDataToAdapter(data: List<DataModel>)
 }
