@@ -9,19 +9,17 @@ import kotlinx.android.synthetic.main.activity_main.*
 import net.svishch.android.dictionary.R
 import net.svishch.android.dictionary.model.AppState
 import net.svishch.android.dictionary.model.repository.entity.DataModel
-import net.svishch.android.dictionary.utils.network.convertMeaningsToString
 import net.svishch.android.dictionary.view.BaseActivity
-import net.svishch.android.dictionary.view.descriptionscreen.DescriptionActivity
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class HistoryActivity : BaseActivity<AppState, HistoryInteractor>() {
+class HistoryActivity : BaseActivity<net.svishch.android.dictionary.model.AppState, HistoryInteractor>() {
 
     override lateinit var model: HistoryViewModel
     private val adapter: HistoryAdapter by lazy { HistoryAdapter(onListItemClickListener) }
 
     private val onListItemClickListener: HistoryAdapter.OnListItemClickListener =
         object : HistoryAdapter.OnListItemClickListener {
-            override fun onItemClick(data: DataModel) {
+            override fun onItemClick(data: net.svishch.android.dictionary.model.repository.entity.DataModel) {
                 Toast.makeText(this@HistoryActivity, "on click: ${data.text}", Toast.LENGTH_SHORT).show()
             }
         }
@@ -50,7 +48,7 @@ class HistoryActivity : BaseActivity<AppState, HistoryInteractor>() {
         model.getData("", false)
     }
 
-    override fun setDataToAdapter(data: List<DataModel>) {
+    override fun setDataToAdapter(data: List<net.svishch.android.dictionary.model.repository.entity.DataModel>) {
         adapter.setData(data)
     }
 
@@ -60,16 +58,16 @@ class HistoryActivity : BaseActivity<AppState, HistoryInteractor>() {
         }
         val viewModel: HistoryViewModel by viewModel()
         model = viewModel
-        model.subscribe().observe(this@HistoryActivity, Observer<AppState> { renderData(it) })
+        model.subscribe().observe(this@HistoryActivity, Observer<net.svishch.android.dictionary.model.AppState> { renderData(it) })
     }
 
     private fun initViews() {
         history_activity_recyclerview.adapter = adapter
     }
 
-    override fun renderData(appState: AppState) {
+    override fun renderData(appState: net.svishch.android.dictionary.model.AppState) {
         when (appState) {
-            is AppState.Success -> {
+            is net.svishch.android.dictionary.model.AppState.Success -> {
                 val data = appState.data
                 if (!data.isNullOrEmpty()) {
                     adapter.setData(data)

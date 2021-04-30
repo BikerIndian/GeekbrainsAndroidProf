@@ -32,7 +32,10 @@ android {
 }
 
 dependencies {
+   // api project(":app")
 
+    implementation project(Modules.model)
+    implementation project(Modules.utils)
     //AndroidX
     implementation Tools.multidex
     implementation Design.appcompat
@@ -47,12 +50,6 @@ dependencies {
     //Kotlin
     implementation Kotlin.core
     implementation Kotlin.stdlib
-
-    //Retrofit 2
-    implementation Retrofit.retrofit
-    implementation Retrofit.converter_gson
-    implementation Retrofit.adapter_coroutines
-    implementation Retrofit.logging_interceptor
 
     //AppCompat
     implementation Design.appcompat
@@ -84,4 +81,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.2'
 
+}
+repositories {
+    mavenCentral()
 }

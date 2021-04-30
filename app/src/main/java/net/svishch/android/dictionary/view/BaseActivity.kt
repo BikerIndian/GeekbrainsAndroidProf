@@ -11,7 +11,7 @@ import net.svishch.android.dictionary.utils.isOnline
 import net.svishch.android.dictionary.utils.ui.AlertDialogFragment
 import net.svishch.android.dictionary.viewmodel.BaseViewModel
 
-abstract class BaseActivity<T : AppState, I : Interactor<T>> : AppCompatActivity() {
+abstract class BaseActivity<T : net.svishch.android.dictionary.model.AppState, I : Interactor<T>> : AppCompatActivity() {
 
     abstract val model: BaseViewModel<T>
 
@@ -51,5 +51,5 @@ abstract class BaseActivity<T : AppState, I : Interactor<T>> : AppCompatActivity
         private const val DIALOG_FRAGMENT_TAG = "74a54328-5d62-46bf-ab6b-cbf5d8c79522"
     }
 
-    abstract fun setDataToAdapter(data: List<DataModel>)
+    abstract fun setDataToAdapter(data: List<net.svishch.android.dictionary.model.repository.entity.DataModel>)
 }

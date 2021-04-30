@@ -4,6 +4,6 @@ import net.svishch.android.dictionary.model.AppState
 
 interface View {
 
-    fun renderData(appState: AppState)
+    fun renderData(appState: net.svishch.android.dictionary.model.AppState)
 
 }
