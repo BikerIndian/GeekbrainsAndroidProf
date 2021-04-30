@@ -2,10 +2,8 @@ package net.svishch.android.dictionary.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.*
 import net.svishch.android.dictionary.model.AppState
-import net.svishch.android.dictionary.model.rx.SchedulerProvider
 
 abstract class BaseViewModel<T : AppState>(
     protected open val _mutableLiveData: MutableLiveData<T> = MutableLiveData()

@@ -1,8 +1,7 @@
 package net.svishch.android.dictionary.model.datasource
 
-import net.svishch.android.dictionary.model.repository.entity.DataModel
-import io.reactivex.Observable
 import net.svishch.android.dictionary.model.AppState
+import net.svishch.android.dictionary.model.repository.entity.DataModel
 import net.svishch.android.dictionary.model.room.DataSourceLocal
 import net.svishch.android.dictionary.model.room.HistoryDao
 import net.svishch.android.dictionary.utils.ui.convertDataModelSuccessToEntity

@@ -1,13 +1,11 @@
 package net.svishch.android.dictionary.model.repository
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
-import net.svishch.android.dictionary.model.repository.entity.DataModel
-import io.reactivex.Observable
 import net.svishch.android.dictionary.model.datasource.BaseInterceptor
 import net.svishch.android.dictionary.model.datasource.DataSource
+import net.svishch.android.dictionary.model.repository.entity.DataModel
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.CallAdapter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
