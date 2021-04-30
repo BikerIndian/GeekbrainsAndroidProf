@@ -28,5 +28,7 @@
     <string name="activity_exception">Sorry</string>
     <string name="error_stub">Error</string>
 
+    <string name="image_stub">image</string>
+    <string name="menu_title_history">History</string>
 
 </resources>

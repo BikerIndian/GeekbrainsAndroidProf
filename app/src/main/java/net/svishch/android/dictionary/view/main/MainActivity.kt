@@ -1,6 +1,9 @@
 package net.svishch.android.dictionary.view.main
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
@@ -12,7 +15,10 @@ import net.svishch.android.dictionary.R
 import net.svishch.android.dictionary.model.AppState
 import net.svishch.android.dictionary.model.repository.entity.DataModel
 import net.svishch.android.dictionary.utils.isOnline
+import net.svishch.android.dictionary.utils.network.convertMeaningsToString
 import net.svishch.android.dictionary.view.BaseActivity
+import net.svishch.android.dictionary.view.descriptionscreen.DescriptionActivity
+import net.svishch.android.dictionary.view.history.HistoryActivity
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class MainActivity : BaseActivity<AppState, MainInteractor>() {
@@ -23,7 +29,14 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     private val onListItemClickListener: MainAdapter.OnListItemClickListener =
         object : MainAdapter.OnListItemClickListener {
             override fun onItemClick(data: DataModel) {
-                Toast.makeText(this@MainActivity, data.text, Toast.LENGTH_SHORT).show()
+                startActivity(
+                    DescriptionActivity.getIntent(
+                        this@MainActivity,
+                        data.text!!,
+                        convertMeaningsToString(data.meanings!!),
+                        data.meanings[0].imageUrl
+                    )
+                )
             }
         }
 
@@ -101,6 +114,21 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         main_activity_recyclerview.adapter = adapter
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_history -> {
+                startActivity(Intent(this, HistoryActivity::class.java))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     private fun showErrorScreen(error: String?) {
         showViewError()
         error_textview.text = error ?: getString(R.string.undefined_error)
@@ -131,5 +159,9 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     companion object {
         private const val BOTTOM_SHEET_FRAGMENT_DIALOG_TAG =
             "74a54328-5d62-46bf-ab6b-cbf5fgt0-092395"
+    }
+
+    override fun setDataToAdapter(data: List<DataModel>) {
+        adapter.setData(data)
     }
 }
