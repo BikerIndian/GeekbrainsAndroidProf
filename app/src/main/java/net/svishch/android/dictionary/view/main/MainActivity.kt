@@ -7,34 +7,33 @@ import android.view.MenuItem
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
-import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
 import net.svishch.android.dictionary.R
 import net.svishch.android.dictionary.model.AppState
+import net.svishch.android.dictionary.model.network.convertMeaningsToString
 import net.svishch.android.dictionary.model.repository.entity.DataModel
 import net.svishch.android.dictionary.utils.isOnline
-import net.svishch.android.dictionary.utils.network.convertMeaningsToString
 import net.svishch.android.dictionary.view.BaseActivity
 import net.svishch.android.dictionary.view.descriptionscreen.DescriptionActivity
 import net.svishch.android.dictionary.view.history.HistoryActivity
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class MainActivity : BaseActivity<AppState, MainInteractor>() {
+class MainActivity : BaseActivity<net.svishch.android.dictionary.model.AppState, MainInteractor>() {
 
     override lateinit var model: MainViewModel
 
     private val adapter: MainAdapter by lazy { MainAdapter(onListItemClickListener) }
     private val onListItemClickListener: MainAdapter.OnListItemClickListener =
         object : MainAdapter.OnListItemClickListener {
-            override fun onItemClick(data: DataModel) {
+            override fun onItemClick(data: net.svishch.android.dictionary.model.repository.entity.DataModel) {
                 startActivity(
                     DescriptionActivity.getIntent(
                         this@MainActivity,
                         data.text!!,
                         convertMeaningsToString(data.meanings!!),
-                        data.meanings[0].imageUrl
+                        data.meanings!![0].imageUrl
                     )
                 )
             }
@@ -71,9 +70,9 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         }
     }
 
-    override fun renderData(appState: AppState) {
+    override fun renderData(appState: net.svishch.android.dictionary.model.AppState) {
         when (appState) {
-            is AppState.Success -> {
+            is net.svishch.android.dictionary.model.AppState.Success -> {
                 showViewWorking()
                 val data = appState.data
                 if (data.isNullOrEmpty()) {
@@ -82,18 +81,18 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
                     adapter.setData(data)
                 }
             }
-            is AppState.Loading -> {
+            is net.svishch.android.dictionary.model.AppState.Loading -> {
                 showViewLoading()
                 if (appState.progress != null) {
                     progress_bar_horizontal.visibility = VISIBLE
                     progress_bar_round.visibility = GONE
-                    progress_bar_horizontal.progress = appState.progress
+                    progress_bar_horizontal.progress = appState.progress!!
                 } else {
                     progress_bar_horizontal.visibility = GONE
                     progress_bar_round.visibility = VISIBLE
                 }
             }
-            is AppState.Error -> {
+            is net.svishch.android.dictionary.model.AppState.Error -> {
                 showViewWorking()
                 showAlertDialog(getString(R.string.error_stub), appState.error.message)
             }
@@ -106,7 +105,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         }
         val viewModel: MainViewModel by viewModel()
         model = viewModel
-        model.subscribe().observe(this@MainActivity, Observer<AppState> { renderData(it) })
+        model.subscribe().observe(this@MainActivity, Observer<net.svishch.android.dictionary.model.AppState> { renderData(it) })
     }
 
     private fun initViews() {
@@ -161,7 +160,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
             "74a54328-5d62-46bf-ab6b-cbf5fgt0-092395"
     }
 
-    override fun setDataToAdapter(data: List<DataModel>) {
+    override fun setDataToAdapter(data: List<net.svishch.android.dictionary.model.repository.entity.DataModel>) {
         adapter.setData(data)
     }
 }

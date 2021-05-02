@@ -11,9 +11,9 @@ import net.svishch.android.dictionary.model.repository.entity.DataModel
 
 class HistoryAdapter(private var onListItemClickListener: OnListItemClickListener) : RecyclerView.Adapter<HistoryAdapter.RecyclerItemViewHolder>() {
 
-    private var data: List<DataModel> = arrayListOf()
+    private var data: List<net.svishch.android.dictionary.model.repository.entity.DataModel> = arrayListOf()
 
-    fun setData(data: List<DataModel>) {
+    fun setData(data: List<net.svishch.android.dictionary.model.repository.entity.DataModel>) {
         this.data = data
         notifyDataSetChanged()
     }
@@ -35,17 +35,17 @@ class HistoryAdapter(private var onListItemClickListener: OnListItemClickListene
 
     inner class RecyclerItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-        fun bind(data: DataModel) {
+        fun bind(data: net.svishch.android.dictionary.model.repository.entity.DataModel) {
             if (layoutPosition != RecyclerView.NO_POSITION) {
                 itemView.header_history_textview_recycler_item.text = data.text
                 itemView.setOnClickListener {openInNewWindow(data)}
             }
         }
     }
-    private fun openInNewWindow(listItemData: DataModel) {
+    private fun openInNewWindow(listItemData: net.svishch.android.dictionary.model.repository.entity.DataModel) {
         onListItemClickListener.onItemClick(listItemData)
     }
     interface OnListItemClickListener {
-        fun onItemClick(data: DataModel)
+        fun onItemClick(data: net.svishch.android.dictionary.model.repository.entity.DataModel)
     }
 }

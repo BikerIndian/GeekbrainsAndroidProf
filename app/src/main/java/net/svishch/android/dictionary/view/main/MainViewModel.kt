@@ -9,16 +9,16 @@ import net.svishch.android.dictionary.utils.ui.parseOnlineSearchResults
 import net.svishch.android.dictionary.viewmodel.BaseViewModel
 
 class MainViewModel(private val interactor: MainInteractor) :
-    BaseViewModel<AppState>() {
+    BaseViewModel<net.svishch.android.dictionary.model.AppState>() {
 
-    private val liveDataForViewToObserve: LiveData<AppState> = _mutableLiveData
+    private val liveDataForViewToObserve: LiveData<net.svishch.android.dictionary.model.AppState> = _mutableLiveData
 
-    fun subscribe(): LiveData<AppState> {
+    fun subscribe(): LiveData<net.svishch.android.dictionary.model.AppState> {
         return liveDataForViewToObserve
     }
 
     override fun getData(word: String, isOnline: Boolean) {
-        _mutableLiveData.value = AppState.Loading(null)
+        _mutableLiveData.value = net.svishch.android.dictionary.model.AppState.Loading(null)
         cancelJob()
         viewModelCoroutineScope.launch { startInteractor(word, isOnline) }
     }
@@ -30,11 +30,11 @@ class MainViewModel(private val interactor: MainInteractor) :
         }
 
     override fun handleError(error: Throwable) {
-        _mutableLiveData.postValue(AppState.Error(error))
+        _mutableLiveData.postValue(net.svishch.android.dictionary.model.AppState.Error(error))
     }
 
     override fun onCleared() {
-        _mutableLiveData.value = AppState.Success(null)//TODO Workaround. Set View to original state
+        _mutableLiveData.value = net.svishch.android.dictionary.model.AppState.Success(null)//TODO Workaround. Set View to original state
         super.onCleared()
     }
 }
