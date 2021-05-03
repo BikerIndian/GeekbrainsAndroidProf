@@ -7,27 +7,35 @@ import android.view.MenuItem
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
-import androidx.lifecycle.Observer
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.play.core.splitinstall.SplitInstallManager
+import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
+import com.google.android.play.core.splitinstall.SplitInstallRequest
 import kotlinx.android.synthetic.main.activity_main.*
 import net.svishch.android.dictionary.R
+import net.svishch.android.dictionary.di.injectDependencies
 import net.svishch.android.dictionary.model.AppState
 import net.svishch.android.dictionary.model.network.convertMeaningsToString
 import net.svishch.android.dictionary.model.repository.entity.DataModel
 import net.svishch.android.dictionary.utils.isOnline
 import net.svishch.android.dictionary.view.BaseActivity
 import net.svishch.android.dictionary.view.descriptionscreen.DescriptionActivity
-import net.svishch.android.dictionary.view.history.HistoryActivity
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class MainActivity : BaseActivity<net.svishch.android.dictionary.model.AppState, MainInteractor>() {
+private const val HISTORY_ACTIVITY_PATH = "net.svishch.android.dictionary.view.history.HistoryActivity"
+private const val HISTORY_ACTIVITY_FEATURE_NAME = "historyscreen"
+
+class MainActivity : BaseActivity<AppState, MainInteractor>() {
 
     override lateinit var model: MainViewModel
+
+    private lateinit var splitInstallManager: SplitInstallManager
 
     private val adapter: MainAdapter by lazy { MainAdapter(onListItemClickListener) }
     private val onListItemClickListener: MainAdapter.OnListItemClickListener =
         object : MainAdapter.OnListItemClickListener {
-            override fun onItemClick(data: net.svishch.android.dictionary.model.repository.entity.DataModel) {
+            override fun onItemClick(data: DataModel) {
                 startActivity(
                     DescriptionActivity.getIntent(
                         this@MainActivity,
@@ -70,9 +78,9 @@ class MainActivity : BaseActivity<net.svishch.android.dictionary.model.AppState,
         }
     }
 
-    override fun renderData(appState: net.svishch.android.dictionary.model.AppState) {
+    override fun renderData(appState: AppState) {
         when (appState) {
-            is net.svishch.android.dictionary.model.AppState.Success -> {
+            is AppState.Success -> {
                 showViewWorking()
                 val data = appState.data
                 if (data.isNullOrEmpty()) {
@@ -81,7 +89,7 @@ class MainActivity : BaseActivity<net.svishch.android.dictionary.model.AppState,
                     adapter.setData(data)
                 }
             }
-            is net.svishch.android.dictionary.model.AppState.Loading -> {
+            is AppState.Loading -> {
                 showViewLoading()
                 if (appState.progress != null) {
                     progress_bar_horizontal.visibility = VISIBLE
@@ -92,7 +100,7 @@ class MainActivity : BaseActivity<net.svishch.android.dictionary.model.AppState,
                     progress_bar_round.visibility = VISIBLE
                 }
             }
-            is net.svishch.android.dictionary.model.AppState.Error -> {
+            is AppState.Error -> {
                 showViewWorking()
                 showAlertDialog(getString(R.string.error_stub), appState.error.message)
             }
@@ -103,9 +111,10 @@ class MainActivity : BaseActivity<net.svishch.android.dictionary.model.AppState,
         if (main_activity_recyclerview.adapter != null) {
             throw IllegalStateException(getString(R.string.activity_exception))
         }
+        injectDependencies()
         val viewModel: MainViewModel by viewModel()
         model = viewModel
-        model.subscribe().observe(this@MainActivity, Observer<net.svishch.android.dictionary.model.AppState> { renderData(it) })
+        model.subscribe().observe(this@MainActivity, { renderData(it) })
     }
 
     private fun initViews() {
@@ -121,11 +130,41 @@ class MainActivity : BaseActivity<net.svishch.android.dictionary.model.AppState,
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_history -> {
-                startActivity(Intent(this, HistoryActivity::class.java))
+               // startActivity(Intent(this, HistoryActivity::class.java))
+                loadFeature()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    fun loadFeature() {
+        splitInstallManager = SplitInstallManagerFactory.create(applicationContext)
+
+        // Создаём запрос на создание экрана
+        val request =
+            SplitInstallRequest
+                .newBuilder()
+                .addModule(HISTORY_ACTIVITY_FEATURE_NAME)
+                .build()
+
+        splitInstallManager
+            .startInstall(request)
+            // Добавляем слушатель в случае успеха
+            .addOnSuccessListener {
+                // Открываем экран
+                val intent = Intent().setClassName(packageName, HISTORY_ACTIVITY_PATH)
+                startActivity(intent)
+            }
+            // Добавляем слушатель в случае, если что-то пошло не так
+            .addOnFailureListener {
+                // Обрабатываем ошибку
+                Toast.makeText(
+                    applicationContext,
+                    "Couldn't download feature: " + it.message,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
     }
 
     private fun showErrorScreen(error: String?) {
@@ -160,7 +199,7 @@ class MainActivity : BaseActivity<net.svishch.android.dictionary.model.AppState,
             "74a54328-5d62-46bf-ab6b-cbf5fgt0-092395"
     }
 
-    override fun setDataToAdapter(data: List<net.svishch.android.dictionary.model.repository.entity.DataModel>) {
+    override fun setDataToAdapter(data: List<DataModel>) {
         adapter.setData(data)
     }
 }

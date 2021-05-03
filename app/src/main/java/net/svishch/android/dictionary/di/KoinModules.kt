@@ -9,11 +9,16 @@ import net.svishch.android.dictionary.model.repository.RepositoryImplementationL
 import net.svishch.android.dictionary.model.repository.RetrofitImplementation
 import net.svishch.android.dictionary.model.repository.entity.DataModel
 import net.svishch.android.dictionary.model.room.HistoryDataBase
-import net.svishch.android.dictionary.view.history.HistoryInteractor
-import net.svishch.android.dictionary.view.history.HistoryViewModel
 import net.svishch.android.dictionary.view.main.MainInteractor
 import net.svishch.android.dictionary.view.main.MainViewModel
+import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
+
+fun injectDependencies() = loadModules
+
+private val loadModules by lazy {
+    loadKoinModules(listOf(application, mainScreen))
+}
 
 val application = module {
     single { Room.databaseBuilder(get(), HistoryDataBase::class.java, "HistoryDB").build() }
@@ -26,9 +31,4 @@ val application = module {
 val mainScreen = module {
     factory { MainViewModel(get()) }
     factory { MainInteractor(get(), get()) }
-}
-
-val historyScreen = module {
-    factory { HistoryViewModel(get()) }
-    factory { HistoryInteractor(get(), get()) }
 }
