@@ -9,6 +9,13 @@ import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.InstallStateUpdatedListener
+import com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE
+import com.google.android.play.core.install.model.InstallStatus
+import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallRequest
@@ -23,14 +30,20 @@ import net.svishch.android.dictionary.view.BaseActivity
 import net.svishch.android.dictionary.view.descriptionscreen.DescriptionActivity
 import org.koin.android.viewmodel.ext.android.viewModel
 
-private const val HISTORY_ACTIVITY_PATH = "net.svishch.android.dictionary.view.history.HistoryActivity"
+private const val HISTORY_ACTIVITY_PATH =
+    "net.svishch.android.dictionary.view.history.HistoryActivity"
 private const val HISTORY_ACTIVITY_FEATURE_NAME = "historyscreen"
+private const val REQUEST_CODE = 42
 
 class MainActivity : BaseActivity<AppState, MainInteractor>() {
+
 
     override lateinit var model: MainViewModel
 
     private lateinit var splitInstallManager: SplitInstallManager
+
+    // Для обновления
+    private lateinit var appUpdateManager: AppUpdateManager
 
     private val adapter: MainAdapter by lazy { MainAdapter(onListItemClickListener) }
     private val onListItemClickListener: MainAdapter.OnListItemClickListener =
@@ -48,6 +61,16 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         }
 
 
+    private val stateUpdatedListener: InstallStateUpdatedListener =
+        InstallStateUpdatedListener { state ->
+            state?.let {
+                if (it.installStatus() == InstallStatus.DOWNLOADED) {
+                    popupSnackbarForCompleteUpdate()
+                }
+            }
+        }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -55,6 +78,28 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         iniViewModel()
         initViews()
         initClickListener()
+        checkForUpdates()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        appUpdateManager
+            .appUpdateInfo
+            .addOnSuccessListener { appUpdateInfo ->
+                if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
+                    popupSnackbarForCompleteUpdate()
+                }
+                if (appUpdateInfo.updateAvailability()
+                    == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS
+                ) {
+                    appUpdateManager.startUpdateFlowForResult(
+                        appUpdateInfo,
+                        IMMEDIATE,
+                        this,
+                        REQUEST_CODE
+                    )
+                }
+            }
     }
 
     private fun initClickListener() {
@@ -130,7 +175,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_history -> {
-               // startActivity(Intent(this, HistoryActivity::class.java))
+                // startActivity(Intent(this, HistoryActivity::class.java))
                 loadFeature()
                 true
             }
@@ -201,5 +246,49 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
 
     override fun setDataToAdapter(data: List<DataModel>) {
         adapter.setData(data)
+    }
+
+    // Сам метод вызываем в onCreate
+    private fun checkForUpdates() {
+        // Создаём менеджер
+        appUpdateManager = AppUpdateManagerFactory.create(applicationContext)
+        // Возвращает интент (appUpdateInfo), который мы будем использовать
+        // в качестве информации для обновления
+        val appUpdateInfo = appUpdateManager.appUpdateInfo
+        // Проверяем наличие обновления
+        appUpdateInfo.addOnSuccessListener { appUpdateIntent ->
+            if (appUpdateIntent.updateAvailability() ==
+                UpdateAvailability.UPDATE_AVAILABLE
+                // Здесь мы делаем проверку на немедленный тип обновления
+                // (IMMEDIATE); для гибкого нужно передавать AppUpdateType.FLEXIBLE
+                && appUpdateIntent.isUpdateTypeAllowed(IMMEDIATE)
+            ) {
+                // Передаём слушатель прогресса (только для гибкого типа
+                // обновления)
+
+                appUpdateManager.registerListener(stateUpdatedListener)
+                // Выполняем запрос
+                appUpdateManager.startUpdateFlowForResult(
+                    appUpdateIntent,
+                    IMMEDIATE,
+                    this,
+                    // Реквест-код для обработки запроса в onActivityResult
+                    REQUEST_CODE
+                )
+            }
+        }
+    }
+
+
+
+    private fun popupSnackbarForCompleteUpdate() {
+        Snackbar.make(
+            findViewById(R.id.activity_main_layout),
+            "An update has just been downloaded.",
+            Snackbar.LENGTH_INDEFINITE
+        ).apply {
+            setAction("RESTART") { appUpdateManager.completeUpdate() }
+            show()
+        }
     }
 }
