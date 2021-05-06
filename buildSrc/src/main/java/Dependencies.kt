@@ -14,7 +14,7 @@ object Releases {
 }
 
 object Modules {
-
+    const val app = ":app"
     const val model = ":model"
     const val utils = ":utils"
     //Features
@@ -56,6 +56,9 @@ object Versions {
 
     //Room
     const val room = "2.2.0-alpha01"
+
+    //Google Play
+    const val googlePlayCore = "1.6.3"
 
     //Test
     const val jUnit = "4.12"
@@ -117,4 +120,8 @@ object TestImpl {
     const val junit = "junit:junit:${Versions.jUnit}"
     const val runner = "androidx.test:runner:${Versions.runner}"
     const val espresso = "androidx.test.espresso:espresso-core:${Versions.espressoCore}"
+}
+
+object GooglePlay {
+    const val googlePlayCore = "com.google.android.play:core:${Versions.googlePlayCore}"
 }

@@ -2,7 +2,6 @@ package net.svishch.android.dictionary.view.history
 
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.launch
-import net.svishch.android.dictionary.model.AppState
 import net.svishch.android.dictionary.utils.ui.parseLocalSearchResults
 import net.svishch.android.dictionary.viewmodel.BaseViewModel
 
