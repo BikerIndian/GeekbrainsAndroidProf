@@ -28,6 +28,7 @@ import net.svishch.android.dictionary.model.repository.entity.DataModel
 import net.svishch.android.dictionary.utils.isOnline
 import net.svishch.android.dictionary.view.BaseActivity
 import net.svishch.android.dictionary.view.descriptionscreen.DescriptionActivity
+import org.koin.android.scope.currentScope
 import org.koin.android.viewmodel.ext.android.viewModel
 
 private const val HISTORY_ACTIVITY_PATH =
@@ -157,7 +158,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
             throw IllegalStateException(getString(R.string.activity_exception))
         }
         injectDependencies()
-        val viewModel: MainViewModel by viewModel()
+        val viewModel: MainViewModel by currentScope.inject()
         model = viewModel
         model.subscribe().observe(this@MainActivity, { renderData(it) })
     }
