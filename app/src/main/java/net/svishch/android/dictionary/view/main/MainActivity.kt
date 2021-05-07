@@ -27,12 +27,10 @@ import net.svishch.android.dictionary.di.injectDependencies
 import net.svishch.android.dictionary.model.AppState
 import net.svishch.android.dictionary.model.network.convertMeaningsToString
 import net.svishch.android.dictionary.model.repository.entity.DataModel
-import net.svishch.android.dictionary.utils.isOnline
 import net.svishch.android.dictionary.utils.ui.viewById
 import net.svishch.android.dictionary.view.BaseActivity
 import net.svishch.android.dictionary.view.descriptionscreen.DescriptionActivity
 import org.koin.android.scope.currentScope
-import org.koin.android.viewmodel.ext.android.viewModel
 
 private const val HISTORY_ACTIVITY_PATH =
     "net.svishch.android.dictionary.view.history.HistoryActivity"
@@ -119,7 +117,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         searchEditText.setOnEditorActionListener { v, actionId, event ->
             println(actionId)
             if (actionId == EditorInfo.IME_ACTION_UNSPECIFIED || actionId == EditorInfo.IME_ACTION_SEARCH) {
-                isNetworkAvailable = isOnline(applicationContext)
+               // isNetworkAvailable = isOnline(applicationContext)
                 if (isNetworkAvailable) {
                     model.getData(searchEditText.text.toString(), isNetworkAvailable)
                 } else {

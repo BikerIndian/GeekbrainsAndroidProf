@@ -1,8 +1,11 @@
 package net.svishch.android.dictionary.model.network
 
+import net.svishch.android.dictionary.model.repository.entity.DataModel
+import net.svishch.android.dictionary.model.repository.entity.Meanings
+
 
 fun parseSearchResults(state: net.svishch.android.dictionary.model.AppState): net.svishch.android.dictionary.model.AppState {
-    val newSearchResults = arrayListOf<net.svishch.android.dictionary.model.repository.entity.DataModel>()
+    val newSearchResults = arrayListOf<DataModel>()
     when (state) {
         is net.svishch.android.dictionary.model.AppState.Success -> {
             val searchResults = state.data
@@ -17,7 +20,7 @@ fun parseSearchResults(state: net.svishch.android.dictionary.model.AppState): ne
     return net.svishch.android.dictionary.model.AppState.Success(newSearchResults)
 }
 
-private fun parseResult(dataModel: net.svishch.android.dictionary.model.repository.entity.DataModel, newDataModels: ArrayList<net.svishch.android.dictionary.model.repository.entity.DataModel>) {
+private fun parseResult(dataModel: DataModel, newDataModels: ArrayList<DataModel>) {
     if (!dataModel.text.isNullOrBlank() && !dataModel.meanings.isNullOrEmpty()) {
         val newMeanings = arrayListOf<net.svishch.android.dictionary.model.repository.entity.Meanings>()
         for (meaning in dataModel.meanings) {
@@ -32,7 +35,7 @@ private fun parseResult(dataModel: net.svishch.android.dictionary.model.reposito
         }
         if (newMeanings.isNotEmpty()) {
             newDataModels.add(
-                net.svishch.android.dictionary.model.repository.entity.DataModel(
+                DataModel(
                     dataModel.text,
                     newMeanings
                 )
@@ -41,7 +44,7 @@ private fun parseResult(dataModel: net.svishch.android.dictionary.model.reposito
     }
 }
 
-fun convertMeaningsToString(meanings: List<net.svishch.android.dictionary.model.repository.entity.Meanings>): String {
+fun convertMeaningsToString(meanings: List<Meanings>): String {
     var meaningsSeparatedByComma = String()
     for ((index, meaning) in meanings.withIndex()) {
         meaningsSeparatedByComma += if (index + 1 != meanings.size) {

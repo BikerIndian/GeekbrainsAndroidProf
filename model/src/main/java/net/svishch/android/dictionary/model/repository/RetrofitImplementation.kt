@@ -1,5 +1,6 @@
 package net.svishch.android.dictionary.model.repository
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
+import net.svishch.android.dictionary.model.datasource.BaseInterceptor
 import net.svishch.android.dictionary.model.repository.entity.DataModel
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -11,7 +12,7 @@ class RetrofitImplementation :
     net.svishch.android.dictionary.model.datasource.DataSource<List<DataModel>> {
 
     override suspend fun getData(word: String): List<DataModel> {
-        return getService(net.svishch.android.dictionary.model.datasource.BaseInterceptor.interceptor).searchAsync(word).await()
+        return getService(BaseInterceptor.interceptor).searchAsync(word).await()
     }
 
     private fun getService(interceptor: Interceptor): ApiService {

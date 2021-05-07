@@ -5,13 +5,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_history_recyclerview_item.view.*
+import net.svishch.android.dictionary.model.repository.entity.DataModel
 
 
 class HistoryAdapter(private var onListItemClickListener: OnListItemClickListener) : RecyclerView.Adapter<HistoryAdapter.RecyclerItemViewHolder>() {
 
-    private var data: List<net.svishch.android.dictionary.model.repository.entity.DataModel> = arrayListOf()
+    private var data: List<DataModel> = arrayListOf()
 
-    fun setData(data: List<net.svishch.android.dictionary.model.repository.entity.DataModel>) {
+    fun setData(data: List<DataModel>) {
         this.data = data
         notifyDataSetChanged()
     }
@@ -33,17 +34,17 @@ class HistoryAdapter(private var onListItemClickListener: OnListItemClickListene
 
     inner class RecyclerItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-        fun bind(data: net.svishch.android.dictionary.model.repository.entity.DataModel) {
+        fun bind(data: DataModel) {
             if (layoutPosition != RecyclerView.NO_POSITION) {
                 itemView.header_history_textview_recycler_item.text = data.text
                 itemView.setOnClickListener {openInNewWindow(data)}
             }
         }
     }
-    private fun openInNewWindow(listItemData: net.svishch.android.dictionary.model.repository.entity.DataModel) {
+    private fun openInNewWindow(listItemData: DataModel) {
         onListItemClickListener.onItemClick(listItemData)
     }
     interface OnListItemClickListener {
-        fun onItemClick(data: net.svishch.android.dictionary.model.repository.entity.DataModel)
+        fun onItemClick(data: DataModel)
     }
 }
