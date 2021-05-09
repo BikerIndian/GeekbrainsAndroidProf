@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.*
 import net.svishch.android.dictionary.model.AppState
 
-abstract class BaseViewModel<T : net.svishch.android.dictionary.model.AppState>(
+abstract class BaseViewModel<T : AppState>(
     protected open val _mutableLiveData: MutableLiveData<T> = MutableLiveData()
 ) : ViewModel() {
 

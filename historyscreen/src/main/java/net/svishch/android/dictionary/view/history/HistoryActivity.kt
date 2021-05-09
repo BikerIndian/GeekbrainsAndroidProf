@@ -10,6 +10,7 @@ import net.svishch.android.dictionary.model.AppState
 import net.svishch.android.dictionary.model.repository.entity.DataModel
 import net.svishch.android.dictionary.view.BaseActivity
 import net.svishch.android.dictionary.view.injectDependencies
+import org.koin.android.scope.currentScope
 import org.koin.android.viewmodel.ext.android.viewModel
 
 
@@ -59,7 +60,7 @@ class HistoryActivity : BaseActivity<AppState, HistoryInteractor>() {
             throw IllegalStateException("The ViewModel should be initialised first")
         }
         injectDependencies()
-        val viewModel: HistoryViewModel by viewModel()
+        val viewModel: HistoryViewModel by currentScope.inject()
         model = viewModel
         model.subscribe().observe(this@HistoryActivity, Observer<AppState> { renderData(it) })
     }

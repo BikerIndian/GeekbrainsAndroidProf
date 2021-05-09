@@ -1,30 +1,29 @@
 package net.svishch.android.dictionary.view
 
 import android.os.Bundle
-import android.os.PersistableBundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import net.svishch.android.dictionary.R
 import net.svishch.android.dictionary.model.AppState
-import net.svishch.android.dictionary.model.repository.entity.DataModel
-import net.svishch.android.dictionary.viewmodel.Interactor
-import net.svishch.android.dictionary.utils.isOnline
+import net.svishch.android.dictionary.utils.network.OnlineLiveData
+import net.svishch.android.dictionary.utils.network.isOnline
 import net.svishch.android.dictionary.utils.ui.AlertDialogFragment
 import net.svishch.android.dictionary.viewmodel.BaseViewModel
+import net.svishch.android.dictionary.viewmodel.Interactor
 
-abstract class BaseActivity<T : net.svishch.android.dictionary.model.AppState, I : Interactor<T>> : AppCompatActivity() {
+abstract class BaseActivity<T : AppState, I : Interactor<T>> : AppCompatActivity() {
 
     abstract val model: BaseViewModel<T>
 
     protected var isNetworkAvailable: Boolean = false
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
-        isNetworkAvailable = isOnline(applicationContext)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        subscribeToNetworkChange()
     }
-
     override fun onResume() {
         super.onResume()
-        isNetworkAvailable = isOnline(applicationContext)
         if (!isNetworkAvailable && isDialogNull()) {
             showNoInternetConnectionDialog()
         }
@@ -45,6 +44,25 @@ abstract class BaseActivity<T : net.svishch.android.dictionary.model.AppState, I
         return supportFragmentManager.findFragmentByTag(DIALOG_FRAGMENT_TAG) == null
     }
 
+    private fun subscribeToNetworkChange() {
+        // Проверка при первом запуске
+        isNetworkAvailable = isOnline(this)
+
+        // Отслеживает изменения
+        OnlineLiveData(this).observe(
+            this@BaseActivity,
+            Observer<Boolean> {
+                isNetworkAvailable = it
+                if (!isNetworkAvailable) {
+                    Toast.makeText(
+                        this@BaseActivity,
+                        R.string.dialog_message_device_is_offline,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            })
+    }
+
     abstract fun renderData(dataModel: T)
 
     companion object {
@@ -52,4 +70,5 @@ abstract class BaseActivity<T : net.svishch.android.dictionary.model.AppState, I
     }
 
     abstract fun setDataToAdapter(data: List<net.svishch.android.dictionary.model.repository.entity.DataModel>)
+
 }

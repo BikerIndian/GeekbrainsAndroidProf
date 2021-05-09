@@ -9,9 +9,12 @@ import net.svishch.android.dictionary.model.repository.RepositoryImplementationL
 import net.svishch.android.dictionary.model.repository.RetrofitImplementation
 import net.svishch.android.dictionary.model.repository.entity.DataModel
 import net.svishch.android.dictionary.model.room.HistoryDataBase
+import net.svishch.android.dictionary.view.main.MainActivity
 import net.svishch.android.dictionary.view.main.MainInteractor
 import net.svishch.android.dictionary.view.main.MainViewModel
+import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 fun injectDependencies() = loadModules
@@ -29,6 +32,8 @@ val application = module {
 }
 
 val mainScreen = module {
-    factory { MainViewModel(get()) }
-    factory { MainInteractor(get(), get()) }
+    scope(named<MainActivity>()) {
+        scoped { MainInteractor(get(), get()) }
+        viewModel { MainViewModel(get()) }
+    }
 }

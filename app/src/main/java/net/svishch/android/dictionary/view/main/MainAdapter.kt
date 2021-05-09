@@ -11,9 +11,9 @@ import net.svishch.android.dictionary.utils.ui.ImgLoader.Companion.usePicassoGet
 
 class MainAdapter(private var onListItemClickListener: OnListItemClickListener) :
     RecyclerView.Adapter<MainAdapter.RecyclerItemViewHolder>() {
-    private var data: List<net.svishch.android.dictionary.model.repository.entity.DataModel> = arrayListOf()
+    private var data: List<DataModel> = arrayListOf()
 
-    fun setData(data: List<net.svishch.android.dictionary.model.repository.entity.DataModel>) {
+    fun setData(data: List<DataModel>) {
         this.data = data
         notifyDataSetChanged()
     }
@@ -35,7 +35,7 @@ class MainAdapter(private var onListItemClickListener: OnListItemClickListener) 
 
     inner class RecyclerItemViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
 
-        fun bind(data: net.svishch.android.dictionary.model.repository.entity.DataModel) {
+        fun bind(data: DataModel) {
             if (layoutPosition != RecyclerView.NO_POSITION) {
                 itemView.header_textview_recycler_item.text = data.text
                 itemView.description_textview_recycler_item.text =
@@ -51,11 +51,11 @@ class MainAdapter(private var onListItemClickListener: OnListItemClickListener) 
         }
     }
 
-    private fun openInNewWindow(listItemData: net.svishch.android.dictionary.model.repository.entity.DataModel) {
+    private fun openInNewWindow(listItemData: DataModel) {
         onListItemClickListener.onItemClick(listItemData)
     }
 
     interface OnListItemClickListener {
-        fun onItemClick(data: net.svishch.android.dictionary.model.repository.entity.DataModel)
+        fun onItemClick(data: DataModel)
     }
 }

@@ -9,7 +9,9 @@ import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.InstallStateUpdatedListener
@@ -25,10 +27,10 @@ import net.svishch.android.dictionary.di.injectDependencies
 import net.svishch.android.dictionary.model.AppState
 import net.svishch.android.dictionary.model.network.convertMeaningsToString
 import net.svishch.android.dictionary.model.repository.entity.DataModel
-import net.svishch.android.dictionary.utils.isOnline
+import net.svishch.android.dictionary.utils.ui.viewById
 import net.svishch.android.dictionary.view.BaseActivity
 import net.svishch.android.dictionary.view.descriptionscreen.DescriptionActivity
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.android.scope.currentScope
 
 private const val HISTORY_ACTIVITY_PATH =
     "net.svishch.android.dictionary.view.history.HistoryActivity"
@@ -41,6 +43,10 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     override lateinit var model: MainViewModel
 
     private lateinit var splitInstallManager: SplitInstallManager
+
+    private val mainActivityRecyclerView by viewById<RecyclerView>(R.id.main_activity_recyclerview)
+    private val searchEditText by viewById<TextInputEditText>(R.id.input_edit_text)
+
 
     // Для обновления
     private lateinit var appUpdateManager: AppUpdateManager
@@ -104,16 +110,16 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
 
     private fun initClickListener() {
         input_layout.setEndIconOnClickListener {
-            model.getData(input_edit_text.text.toString(), isNetworkAvailable)
+            model.getData(searchEditText.text.toString(), isNetworkAvailable)
         }
 
         // Отработка нажатия ENTER
-        input_edit_text.setOnEditorActionListener { v, actionId, event ->
+        searchEditText.setOnEditorActionListener { v, actionId, event ->
             println(actionId)
             if (actionId == EditorInfo.IME_ACTION_UNSPECIFIED || actionId == EditorInfo.IME_ACTION_SEARCH) {
-                isNetworkAvailable = isOnline(applicationContext)
+               // isNetworkAvailable = isOnline(applicationContext)
                 if (isNetworkAvailable) {
-                    model.getData(input_edit_text.text.toString(), isNetworkAvailable)
+                    model.getData(searchEditText.text.toString(), isNetworkAvailable)
                 } else {
                     showNoInternetConnectionDialog()
                 }
@@ -153,18 +159,18 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     }
 
     private fun iniViewModel() {
-        if (main_activity_recyclerview.adapter != null) {
+        if (mainActivityRecyclerView.adapter != null) {
             throw IllegalStateException(getString(R.string.activity_exception))
         }
         injectDependencies()
-        val viewModel: MainViewModel by viewModel()
+        val viewModel: MainViewModel by currentScope.inject()
         model = viewModel
         model.subscribe().observe(this@MainActivity, { renderData(it) })
     }
 
     private fun initViews() {
-        main_activity_recyclerview.layoutManager = LinearLayoutManager(applicationContext)
-        main_activity_recyclerview.adapter = adapter
+        mainActivityRecyclerView.layoutManager = LinearLayoutManager(applicationContext)
+        mainActivityRecyclerView.adapter = adapter
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

@@ -8,17 +8,17 @@ import net.svishch.android.dictionary.model.repository.Repository
 
 
 class MainInteractor(
-    private val repositoryRemote: net.svishch.android.dictionary.model.repository.Repository<List<net.svishch.android.dictionary.model.repository.entity.DataModel>>,
-    private val repositoryLocal: net.svishch.android.dictionary.model.datasource.RepositoryLocal<List<net.svishch.android.dictionary.model.repository.entity.DataModel>>
-) : Interactor<net.svishch.android.dictionary.model.AppState> {
+    private val repositoryRemote: Repository<List<DataModel>>,
+    private val repositoryLocal: RepositoryLocal<List<DataModel>>
+) : Interactor<AppState> {
 
-    override suspend fun getData(word: String, fromRemoteSource: Boolean): net.svishch.android.dictionary.model.AppState {
-        val appState: net.svishch.android.dictionary.model.AppState
+    override suspend fun getData(word: String, fromRemoteSource: Boolean): AppState {
+        val appState: AppState
         if (fromRemoteSource) {
-            appState = net.svishch.android.dictionary.model.AppState.Success(repositoryRemote.getData(word))
+            appState = AppState.Success(repositoryRemote.getData(word))
             repositoryLocal.saveToDB(appState)
         } else {
-            appState = net.svishch.android.dictionary.model.AppState.Success(repositoryLocal.getData(word))
+            appState = AppState.Success(repositoryLocal.getData(word))
         }
         return appState
     }
