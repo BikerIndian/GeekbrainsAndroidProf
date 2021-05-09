@@ -2,6 +2,7 @@ package net.svishch.android.dictionary.view.main
 
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View.GONE
@@ -183,6 +184,10 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
             R.id.menu_history -> {
                 // startActivity(Intent(this, HistoryActivity::class.java))
                 loadFeature()
+                true
+            }
+            R.id.menu_screen_settings -> {
+                startActivityForResult(Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY), 42)
                 true
             }
             else -> super.onOptionsItemSelected(item)

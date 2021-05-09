@@ -31,5 +31,5 @@
     <string name="image_stub">image</string>
     <string name="menu_title_history">History</string>
     <string name="title_historyscreen">History</string>
-
+    <string name="menu_title_settings">Settings</string>
 </resources>

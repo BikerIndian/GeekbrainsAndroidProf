@@ -6,4 +6,9 @@
         android:title="@string/menu_title_history"
         android:icon="@drawable/ic_history"
         app:showAsAction="always"/>
+    <item
+        android:id="@+id/menu_screen_settings"
+        android:title="@string/menu_title_settings"
+        android:icon="@drawable/ic_settings"
+        app:showAsAction="always"/>
 </menu>
